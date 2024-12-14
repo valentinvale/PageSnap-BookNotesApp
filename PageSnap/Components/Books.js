@@ -1,7 +1,8 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { View, Text } from "react-native";
 import styled from "styled-components/native";
+import { useNavigation } from "@react-navigation/native";
+import { ADDBOOK } from "../Router/RouteNames";
 
 const ContainerEmptyText = styled.Text`
     font-size: 20px;
@@ -27,22 +28,27 @@ const AddBookButton = styled.TouchableOpacity`
     background-color:rgb(40, 151, 214);
     padding: 10px;
     margin: 10px;
-    border-radius: 5px;
-    color: white;`;
+    border-radius: 5px
+`;
 
-function Books() {
+const Books = () => {
 
     const [books, setBooks] = useState([]);
+    const navigation = useNavigation();
 
     useEffect(() => {
         // Get books from database
         // setBooks(booksFromDatabase);
     }, []);
 
+    const addBook = () => {
+        navigation.navigate(ADDBOOK);
+    }
+
     if (books.length === 0) {
         return (
             <Container>
-                <AddBookButton><ButtonText>Add Book</ButtonText></AddBookButton>
+                <AddBookButton onPress={addBook}><ButtonText>Add Book</ButtonText></AddBookButton>
                 <ContainerEmptyText>Looking pretty empty.</ContainerEmptyText>
                 <ContainerEmptyText> Add some books to get started.</ContainerEmptyText>
             </Container>

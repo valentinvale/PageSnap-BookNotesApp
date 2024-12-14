@@ -1,3 +1,3 @@
-export const BOOKS = "Books";
+export const BOOKS = "My Books";
 
-export const ADDBOOK = "AddBook";
+export const ADDBOOK = "Add Book";
