@@ -21,7 +21,7 @@ export const getBookById = async (db, id) => {
 export const addBook = async (db, title, author, coverImagePath) => {
     try {
         const dateAdded = new Date().toISOString();
-        await db.executeSql(
+        await db.execAsync(
             `INSERT INTO Books (title, author, coverImagePath, dateAdded) VALUES (?, ?, ?, ?)`,
             [title, author, coverImagePath, dateAdded]
         );

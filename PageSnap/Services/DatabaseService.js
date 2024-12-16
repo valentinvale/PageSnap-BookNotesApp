@@ -1,61 +1,70 @@
-import SQLite from 'react-native-sqlite-storage';
+import * as SQLite from 'expo-sqlite';
 
-const database_name = "PageSnap.db";
-const database_version = "1.0";
-const database_displayname = "PageSnap Database";
-const database_size = 200000;
+const databaseName = "PageSnap.db";
 
-export const getDataBase = async () => {
-
-    return SQLite.openDatabase(
-        database_name,
-        database_version,
-        database_displayname,
-        database_size,
-        () => {
-            console.log("Database Opened");
-        },
-        (error) => {
-            console.log("Error: " + error);
-        }
-    );
+/**
+ * Open the SQLite database asynchronously.
+ * @returns {Promise<SQLite.SQLiteDatabase>} The database instance.
+ */
+export const getDatabase = async () => {
+    try {
+        const db = await SQLite.openDatabaseAsync(databaseName);
+        console.log("Database opened successfully.");
+        return db;
+    } catch (error) {
+        console.error("Error opening database:", error);
+        return null;
+    }
 };
 
+/**
+ * Initialize the database by creating necessary tables.
+ * @param {SQLite.SQLiteDatabase} db - The SQLite database instance.
+ */
 export const initDatabase = async (db) => {
+    if (!db) {
+        console.error("Database object is null. Initialization aborted.");
+        return;
+    }
 
-    try{
-        await db.executeSql(
-            `CREATE TABLE IF NOT EXISTS Books (
+    try {
+        // Execute SQL commands using `executeAsync`
+        await db.execAsync(`
+            CREATE TABLE IF NOT EXISTS Books (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT,
-                author TEXT,
+                title TEXT NOT NULL,
+                author TEXT NOT NULL,
                 coverImagePath TEXT,
-                dateAdded TEXT,
-            )`
-        );
-    
-        await db.executeSql(
-            `CREATE TABLE IF NOT EXISTS Quotes (
+                dateAdded TEXT NOT NULL
+            );
+        `);
+        console.log("Books table created successfully.");
+
+        await db.execAsync(`
+            CREATE TABLE IF NOT EXISTS Quotes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                bookId INTEGER,
-                quote TEXT,
+                bookId INTEGER NOT NULL,
+                quote TEXT NOT NULL,
                 Notes TEXT,
                 pageStart INTEGER,
                 pageEnd INTEGER,
                 FOREIGN KEY (bookId) REFERENCES Books(id)
-            )`
-        );
-    
-        await db.executeSql(
-            `CREATE TABLE IF NOT EXISTS QuoteImages (
+            );
+        `);
+        console.log("Quotes table created successfully.");
+
+        await db.execAsync(`
+            CREATE TABLE IF NOT EXISTS QuoteImages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                quoteId INTEGER,
-                imagePath TEXT,
-                FOREIGN KEY (quoteId) REFERENCES Quotes(id
-            )`
-        );
+                quoteId INTEGER NOT NULL,
+                imagePath TEXT NOT NULL,
+                FOREIGN KEY (quoteId) REFERENCES Quotes(id)
+            );
+        `);
+        console.log("QuoteImages table created successfully.");
+
+        console.log("All tables created successfully.");
+    } catch (error) {
+        console.error("Error initializing database tables:", error);
     }
-    catch (error) {
-        console.log("Error: " + error);
-    }
-}
+};
