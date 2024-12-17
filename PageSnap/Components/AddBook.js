@@ -1,5 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { useDatabase } from "../Context/DatabaseContext";
 import styled from "styled-components/native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCameraRetro } from '@fortawesome/free-solid-svg-icons/faCameraRetro';
@@ -8,6 +10,8 @@ import * as ImagePicker from 'expo-image-picker';
 import PhotoPickerModal from "./PhotoPickerModal";
 import { Image } from "react-native";
 import { addBook } from "../Services/BookService";
+import { saveImage } from "../Services/FSService";
+import { BOOKS } from "../Router/RouteNames";
 
 const ContainerText = styled.Text`
     font-size: 20px;
@@ -89,6 +93,9 @@ const AddBook = () => {
     const [coverPhoto, setCoverPhoto] = useState("");
     const [modalOpened, setModalOpened] = useState(false);
 
+    const db = useDatabase();
+    const navigation = useNavigation();
+
     const takePhoto = async () => {
         console.log("Take Photo");
         setModalOpened(false);
@@ -138,29 +145,42 @@ const AddBook = () => {
 
     };
 
-    const AddBook = () => {
+    const handleAddBook = async () => {
         console.log("Add Book");
         console.log(title);
         console.log(author);
         
-        if(title == "" || author == ""){
+        if(!title || !author){
             alert("Please enter a title and author.");
             return;
         }
 
-        if(coverPhoto == ""){
+        if(!coverPhoto){
             alert("Please add a cover photo.");
             return;
         }
 
+        try{
+            const savedPhotoPath = await saveImage(coverPhoto);
+            await addBook(db, title, author, savedPhotoPath);
+            setTitle("");
+            setAuthor("");
+            setCoverPhoto("");
+            navigation.navigate(BOOKS);
+            alert("Book added successfully.");
+        }
+        catch(error){
+            console.log("Error adding book:", error);
+            alert("Error adding book.");
+        }
 
 
     };
 
     return (
         <Container>
-            <TextInput placeholder="Title" onChangeText={(text) => setTitle(text)} />
-            <TextInput placeholder="Author" onChangeText={(text) => setAuthor(text)} />
+            <TextInput value={title} placeholder="Title" onChangeText={(text) => setTitle(text)} />
+            <TextInput value={author} placeholder="Author" onChangeText={(text) => setAuthor(text)} />
             {coverPhoto ? 
             <PhotoContainer>
                 <CoverPhoto source={{uri: coverPhoto}} />
@@ -177,7 +197,7 @@ const AddBook = () => {
             }
             
             <AddBookButton>
-                <ButtonText onPress={AddBook}>Add Book</ButtonText>
+                <ButtonText onPress={handleAddBook}>Add Book</ButtonText>
             </AddBookButton>
         </Container>
     );

@@ -26,7 +26,8 @@
     "react-native-styled-components": "^2.1.0",
     "react-native-svg": "15.8.0",
     "react-navigation": "^5.0.0",
-    "styled-components": "^6.1.13"
+    "styled-components": "^6.1.13",
+    "expo-file-system": "~18.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2"

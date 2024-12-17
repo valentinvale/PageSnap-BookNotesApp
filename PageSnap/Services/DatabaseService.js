@@ -34,7 +34,7 @@ export const initDatabase = async (db) => {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 author TEXT NOT NULL,
-                coverImagePath TEXT,
+                coverImagePath TEXT NOT NULL,
                 dateAdded TEXT NOT NULL
             );
         `);

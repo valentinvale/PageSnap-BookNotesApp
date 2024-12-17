@@ -20,11 +20,13 @@ export const getBookById = async (db, id) => {
 
 export const addBook = async (db, title, author, coverImagePath) => {
     try {
+        console.log("Adding book: " + title + " by " + author);
         const dateAdded = new Date().toISOString();
-        await db.execAsync(
+        await db.runAsync(
             `INSERT INTO Books (title, author, coverImagePath, dateAdded) VALUES (?, ?, ?, ?)`,
             [title, author, coverImagePath, dateAdded]
         );
+        console.log("Book added successfully.");
     }
     catch (error) {
         console.log("Error: " + error);
