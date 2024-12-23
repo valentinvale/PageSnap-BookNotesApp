@@ -166,7 +166,7 @@ const AddBook = () => {
             setTitle("");
             setAuthor("");
             setCoverPhoto("");
-            navigation.navigate(BOOKS);
+            navigation.goBack();
             alert("Book added successfully.");
         }
         catch(error){

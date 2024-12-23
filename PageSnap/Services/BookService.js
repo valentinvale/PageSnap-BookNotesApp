@@ -1,7 +1,8 @@
 export const getBooks = async (db) => {
     try {
-        const books = await db.executeSql(`SELECT * FROM Books`);
-        return books[0].rows._array;
+        const books = await db.getAllAsync(`SELECT * FROM Books`);
+        console.log(books);
+        return books;
     }
     catch (error) {
         console.log("Error: " + error);
@@ -10,8 +11,10 @@ export const getBooks = async (db) => {
 
 export const getBookById = async (db, id) => {
     try {
-        const book = await db.executeSql(`SELECT * FROM Books WHERE id = ?`, [id]);
-        return book[0].rows._array[0];
+        console.log("Getting book with id: " + id);
+        const book = await db.getFirstAsync(`SELECT * FROM Books WHERE id = ?`, [id]);
+        console.log(book);
+        return book;
     }
     catch (error) {
         console.log("Error: " + error);
