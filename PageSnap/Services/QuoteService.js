@@ -1,16 +1,16 @@
-export const addQuote = async (db, bookId, quote, notes, pageStart, pageEnd, imagePaths) => {
+export const addQuote = async (db, bookId, notes, pageStart, pageEnd, imagePaths) => {
     try {
         const dateAdded = new Date().toISOString();
-        await db.executeSql(
-            `INSERT INTO Quotes (bookId, quote, notes, pageStart, pageEnd, dateAdded) VALUES (?, ?, ?, ?, ?, ?)`,
-            [bookId, quote, notes, pageStart, pageEnd, dateAdded]
+        await db.runAsync(
+            `INSERT INTO Quotes (bookId, notes, pageStart, pageEnd, dateAdded) VALUES (?, ?, ?, ?, ?)`,
+            [bookId, notes, pageStart, pageEnd, dateAdded]
         );
 
-        const quote = await db.executeSql(`SELECT * FROM Quotes WHERE dateAdded = ?`, [dateAdded]);
-        const quoteId = quote[0].rows._array[0].id;
+        const quote = await db.getFirstAsync(`SELECT * FROM Quotes WHERE dateAdded = ?`, [dateAdded]);
+        const quoteId = quote.id;
 
         imagePaths.forEach(async (imagePath) => {
-            await db.executeSql(
+            await db.runAsync(
                 `INSERT INTO QuoteImages (quoteId, imagePath) VALUES (?, ?)`,
                 [quoteId, imagePath]
             );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use } from "react";
 import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useDatabase } from "../Context/DatabaseContext";
@@ -11,7 +11,6 @@ import PhotoPickerModal from "./PhotoPickerModal";
 import { Image } from "react-native";
 import { addBook } from "../Services/BookService";
 import { saveImage } from "../Services/FSService";
-import { BOOKS } from "../Router/RouteNames";
 
 const ContainerText = styled.Text`
     font-size: 20px;
@@ -96,54 +95,55 @@ const AddBook = () => {
     const db = useDatabase();
     const navigation = useNavigation();
 
+    useEffect(() => {
+        setTitle("");
+        setAuthor("");
+        setCoverPhoto("");
+    }, []);
+
     const takePhoto = async () => {
-        console.log("Take Photo");
-        setModalOpened(false);
+            try {
+                const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                if (status !== 'granted') {
+                    alert('Camera permissions are required to take photos.');
+                    return;
+                }
         
-        const { status } = await ImagePicker.requestCameraPermissionsAsync({
-            mediaTypes: Image,
-            allowsEditing: true,
-            aspect: [9, 16],
-            quality: 1
-        });
-        if (status !== 'granted') {
-            alert('Sorry, we need camera permissions to make this work!');
-            return;
-        }
-
-        let result = await ImagePicker.launchCameraAsync();
+                const result = await ImagePicker.launchCameraAsync({
+                    allowsEditing: true,
+                    aspect: [9, 16],
+                    quality: 1,
+                });
         
-        if(!result.canceled){
-            setCoverPhoto(result.assets[0].uri);
-        }
-
-        console.log(result);
-    }
-
-    const pickImage = async () => {
-        console.log("Pick Image");
-        setModalOpened(false);
+                if (!result.canceled) {
+                    setCoverPhoto(result.assets[0].uri);
+                }
+            } catch (error) {
+                console.error("Error opening camera:", error);
+            }
+        };
         
-        const { status } = await ImagePicker.requestCameraPermissionsAsync({
-            mediaTypes: Image,
-            allowsEditing: true,
-            aspect: [9, 16],
-            quality: 1
-        });
-        if (status !== 'granted') {
-            alert('Sorry, we need camera roll permissions to make this work!');
-            return;
-        }
-
-        let result = await ImagePicker.launchImageLibraryAsync();
+        const pickImage = async () => {
+            try {
+                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                if (status !== 'granted') {
+                    alert('Media library permissions are required to select images.');
+                    return;
+                }
         
-        if(!result.canceled){
-            setCoverPhoto(result.assets[0].uri);
-        }
-
-        console.log(result);
-
-    };
+                const result = await ImagePicker.launchImageLibraryAsync({
+                    allowsEditing: true,
+                    aspect: [9, 16],
+                    quality: 1,
+                });
+        
+                if (!result.canceled) {
+                    setCoverPhoto(result.assets[0].uri);
+                }
+            } catch (error) {
+                console.error("Error opening image picker:", error);
+            }
+        };
 
     const handleAddBook = async () => {
         console.log("Add Book");

@@ -44,10 +44,10 @@ export const initDatabase = async (db) => {
             CREATE TABLE IF NOT EXISTS Quotes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 bookId INTEGER NOT NULL,
-                quote TEXT NOT NULL,
-                Notes TEXT,
+                notes TEXT,
                 pageStart INTEGER,
                 pageEnd INTEGER,
+                dateAdded TEXT NOT NULL,
                 FOREIGN KEY (bookId) REFERENCES Books(id)
             );
         `);
@@ -64,6 +64,8 @@ export const initDatabase = async (db) => {
         console.log("QuoteImages table created successfully.");
 
         console.log("All tables created successfully.");
+        
+
     } catch (error) {
         console.error("Error initializing database tables:", error);
     }
